@@ -49,7 +49,9 @@ The **Todo** feature demonstrates VSA principles in action:
 ```
 Open Swagger docs: http://localhost:8080/swagger-ui.html
 
-## 🧩 Your Mission: Create the `greeting` Feature
+## 📚 Learning Tasks
+
+### Task 1: Create the "Greeting" Feature
 
 Your task is to build a new Spring feature called `greeting`, and connect it to the existing `todo` feature.
 
@@ -112,3 +114,43 @@ When both tests are green and the endpoint works, **congratulations!**
 You've created a feature using Spring idioms and learned how features interact via Dependency Injection.
 
 🔥 Welcome to the backend side.
+
+### Task 2: Create the "Statistics" Feature
+
+#### 🎯 Objective
+Create a REST endpoint `/api/statistics` that provides insights about Todo items.
+
+#### 📋 Requirements
+
+**1. API Endpoint**
+- Base path: `/api/statistics`
+- Support query parameters:
+    - `from` - Start date (e.g., `2023-01-01`)
+    - `to` - End date (e.g., `2023-12-31`)
+    - `format` - Response format (`summary` or `detailed`)
+
+**2. Statistics to Include**
+- Total number of todos
+- Number of completed todos
+- Number of pending todos
+- Todos per user breakdown
+
+**3. Technical Requirements**
+- Use MongoDB aggregations for efficient data processing
+- Create DTOs for API responses
+- Implement proper error handling
+- Follow existing architectural patterns
+
+**4. Sample Response**
+```json
+{
+  "totalTodos": 10,
+  "completedTodos": 7,
+  "pendingTodos": 3,
+  "userStats": {
+    "user1": 5,
+    "user2": 3,
+    "user3": 2
+  }
+}
+```
