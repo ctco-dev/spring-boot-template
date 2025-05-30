@@ -14,6 +14,29 @@ Welcome, developer! 👋 This project is a **learning platform** for frontend de
 - 🧪 **ArchUnit tests** to enforce clean architecture
 - 🔍 Functional tests to validate feature behavior using Testcontainers
 
+## 🏗 Architecture
+
+This project implements **Vertical Slice Architecture (VSA)**, organizing code around features rather than technical layers. You can explore this through the **Todo** feature implementation.
+
+### Why VSA?
+
+- 🎯 Feature-focused organization
+- 🔄 Independent, full-stack slices
+- 🚀 Faster development cycles
+- 🛠 Easier maintenance
+
+Learn more about VSA:
+- [Baeldung: Vertical Slice Architecture in Java](https://www.baeldung.com/java-vertical-slice-architecture)
+- [Exploring Software Architecture: Vertical Slice](https://medium.com/@andrew.macconnell/exploring-software-architecture-vertical-slice-789fa0a09be6)
+
+### 🎯 Todo Feature Showcase
+
+The **Todo** feature demonstrates VSA principles in action:
+- Complete vertical slice from API to persistence
+- Self-contained in `features/todo` package
+- Includes dedicated tests and documentation
+- Shows proper dependency management
+
 ## 🚀 Run the app
 
 1. Make sure you have:
