@@ -2,32 +2,28 @@
 
 Welcome, developer! 👋 This project is a **learning platform** for frontend devs who want to understand the Java + Spring ecosystem — through code, not slides.
 
-## ✅ What you’ll find
+## ✅ What you'll find
 
 - ✅ A working feature: **Todo**
-  - `TodoController`, `TodoService`, `TodoRepository`, `Todo` model
-  - Uses MongoDB for persistence
-  - Demonstrates Dependency Injection (DI) using constructor injection
-  - Has Swagger UI docs via springdoc-openapi
+    - `TodoController`, `TodoService`, `TodoRepository`, `Todo` model
+    - Uses MongoDB for persistence with Testcontainers for testing
+    - Demonstrates Dependency Injection (DI) using constructor injection
+    - Has Swagger UI docs via springdoc-openapi
 
 - 🧠 Learning-oriented JavaDocs with links to Spring resources
 - 🧪 **ArchUnit tests** to enforce clean architecture
-- 🔍 Functional tests to validate feature behavior
-
----
+- 🔍 Functional tests to validate feature behavior using Testcontainers
 
 ## 🚀 Run the app
 
-1. Make sure you have Java 21 and Docker installed
-2. Run MongoDB with Docker:
+1. Make sure you have:
+    - Java 21
+    - Docker running
 
+2. Start the app:
 ```bash
-docker run --rm -d -p 27017:27017 --name mongo mongo:6
-
-```
-Start the app
 ./gradlew bootRun
-
+```
 Open Swagger docs: http://localhost:8080/swagger-ui.html
 
 ## 🧩 Your Mission: Create the `greeting` Feature

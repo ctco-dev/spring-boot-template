@@ -26,7 +26,10 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit:1.4.0")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring3x:4.11.0")
+    // Testcontainers dependencies
+    testImplementation("org.testcontainers:testcontainers:1.21.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.0")
+    testImplementation("org.testcontainers:mongodb:1.21.0")
 }
 
 tasks.test {

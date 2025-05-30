@@ -4,6 +4,7 @@ import lv.ctco.springboottemplate.features.todo.TodoService;
 import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Integration test for {@link GreetingService}.
@@ -15,10 +16,20 @@ import org.springframework.test.context.TestConstructor;
  */
 @SpringBootTest
 @Disabled("Enable after implementing GreetingService using TodoService")
+@Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class GreetingServiceIntegrationTest {
 
-  /*  private final TodoService todoService;
+  /*
+
+  @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
+
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+  }
+
+  private final TodoService todoService;
   private final TodoRepository todoRepository;
   private final GreetingService greetingService;
 
@@ -82,5 +93,6 @@ class GreetingServiceIntegrationTest {
 
     // then
     assertThat(message).contains("1 open task");
-  }*/
+  }
+  */
 }
