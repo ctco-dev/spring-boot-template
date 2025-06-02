@@ -43,7 +43,13 @@ The **Todo** feature demonstrates VSA principles in action:
     - Java 21
     - Docker running
 
-2. Start the app:
+
+2. Start MongoDB:
+```bash
+docker run -d --name mongodb -p 27017:27017 mongo:latest
+```
+
+3. Start the app:
 ```bash
 ./gradlew bootRun
 ```
@@ -92,7 +98,7 @@ We've prepared tests to verify your work:
 
 ✅ ArchUnit tests will prevent you from structure issues
 
-✅ `GreetingControllerFunctionalTest.java`  
+✅ `GreetingServiceIntegrationTest.java`  
 📍 Location: `src/test/java/lv/ctco/springboottemplate/features/greeting/`  
 🔒 Also `@Disabled`. Remove to test your endpoint.
 
@@ -140,8 +146,9 @@ Create a REST endpoint `/api/statistics` that provides insights about Todo items
 - Create DTOs for API responses
 - Implement proper error handling
 - Follow existing architectural patterns
+- Test code with unit and integration tests
 
-**4. Sample Response**
+**4. Summary Sample Response**
 ```json
 {
   "totalTodos": 10,
@@ -151,6 +158,40 @@ Create a REST endpoint `/api/statistics` that provides insights about Todo items
     "user1": 5,
     "user2": 3,
     "user3": 2
+  }
+}
+```
+**5. Detailed Sample Response**
+```json
+{
+  "totalTodos": 10,
+  "completedTodos": 7,
+  "pendingTodos": 3,
+  "userStats": {
+    "user1": 5,
+    "user2": 3,
+    "user3": 2
+  },
+  "todos": {
+    "completed": [
+      {
+        "id": "1",
+        "title": "Deploy to production",
+        "createdBy": "user1",
+        "createdAt": "2024-03-15T10:30:00Z",
+        "completedAt": "2024-03-15T14:20:00Z"
+      },
+      // ... more completed todos
+    ],
+    "pending": [
+      {
+        "id": "8",
+        "title": "Review pull request",
+        "createdBy": "user2",
+        "createdAt": "2024-03-15T09:00:00Z"
+      },
+      // ... more pending todos
+    ]
   }
 }
 ```
