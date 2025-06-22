@@ -27,9 +27,9 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     // Testcontainers dependencies
-    testImplementation("org.testcontainers:testcontainers:1.21.1")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.1")
-    testImplementation("org.testcontainers:mongodb:1.21.1")
+    testImplementation("org.testcontainers:testcontainers:1.21.2")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.2")
+    testImplementation("org.testcontainers:mongodb:1.21.2")
 }
 
 tasks.test {
