@@ -47,7 +47,8 @@ public class PackageAccessTest {
               .because(
                   "Repositories in '"
                       + feature
-                      + "' should only be used within their own feature.");
+                      + "' should only be used within their own feature. "
+                      + "To access data from other features, use their Service classes instead.");
 
       rule.check(importedClasses);
     }
