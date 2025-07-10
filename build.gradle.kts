@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+
 plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
@@ -34,6 +36,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        exceptionFormat = FULL
+    }
     finalizedBy(tasks.jacocoTestReport) // ensure report runs after tests
 
     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
