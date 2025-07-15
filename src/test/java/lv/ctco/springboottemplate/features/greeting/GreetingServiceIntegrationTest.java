@@ -102,6 +102,6 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("1 open task");
+    assertThat(message).endsWith("1 open task.");
   }
 }

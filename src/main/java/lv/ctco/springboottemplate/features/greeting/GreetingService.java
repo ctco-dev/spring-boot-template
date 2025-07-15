@@ -13,6 +13,8 @@ public class GreetingService {
 
     public String greet() {
         var todosCount = todoService.getAllTodos().stream().filter(todo -> !todo.completed()).count();
-        return String.format("Hello from Spring! You have %s open tasks.", todosCount);
+        var isPlural = todosCount != 1;
+        var taskWord = isPlural ? "tasks" : "task";
+        return String.format("Hello from Spring! You have %s open %s.", todosCount, taskWord);
     }
 }

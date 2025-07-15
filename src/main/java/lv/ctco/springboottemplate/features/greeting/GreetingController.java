@@ -17,7 +17,7 @@ public class GreetingController {
 
   @GetMapping
   @Operation(summary = "Get greeting message")
-  public String getAllTodos() {
+  public String getGreeting() {
     return greetingService.greet();
   }
 }
