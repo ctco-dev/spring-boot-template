@@ -21,7 +21,7 @@ public class GreetingService {
     private Integer countTodos() {
         List<Todo> todoList = this.todoService.getAllTodos();
         return (int) todoList.stream()
-                .filter(todo -> !Boolean.TRUE.equals(todo.completed())).count();
+                .filter(todo -> Boolean.FALSE.equals(todo.completed())).count();
     }
 
 }
