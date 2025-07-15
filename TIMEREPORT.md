@@ -1,7 +1,7 @@
 # ⏱️ Time Report
 
 **Date:** 2025-07-15  
-**Developer:** [Your Name]
+**Developer:** Viktors Gusevs
 
 ---
 
