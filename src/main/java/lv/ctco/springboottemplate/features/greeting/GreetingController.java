@@ -11,16 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Greeting Controller", description = "Greeting endpoints")
 public class GreetingController {
 
-    private final GreetingService greetingService;
+  private final GreetingService greetingService;
 
-    public GreetingController(GreetingService greetingService) {
-        this.greetingService = greetingService;
-    }
+  public GreetingController(GreetingService greetingService) {
+    this.greetingService = greetingService;
+  }
 
-    @GetMapping
-    @Operation(summary = "Greet (counts open todos)")
-    public String greet() {
-        return this.greetingService.greet();
-    }
-
+  @GetMapping
+  @Operation(summary = "Greet (counts open todos)")
+  public String greet() {
+    return this.greetingService.greet();
+  }
 }
