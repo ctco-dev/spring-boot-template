@@ -1,5 +1,8 @@
 package lv.ctco.springboottemplate.features.greeting;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import lv.ctco.springboottemplate.features.todo.TodoRepository;
 import lv.ctco.springboottemplate.features.todo.TodoService;
@@ -13,10 +16,6 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Integration test for {@link GreetingService}.
  *
@@ -28,76 +27,75 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class GreetingServiceIntegrationTest {
 
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
-    private final TodoService todoService;
-    private final TodoRepository todoRepository;
-    private final GreetingService greetingService;
+  @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
+  private final TodoService todoService;
+  private final TodoRepository todoRepository;
+  private final GreetingService greetingService;
 
-    GreetingServiceIntegrationTest(
-            TodoService todoService, TodoRepository todoRepository, GreetingService greetingService) {
-        this.todoService = todoService;
-        this.todoRepository = todoRepository;
-        this.greetingService = greetingService;
-    }
+  GreetingServiceIntegrationTest(
+      TodoService todoService, TodoRepository todoRepository, GreetingService greetingService) {
+    this.todoService = todoService;
+    this.todoRepository = todoRepository;
+    this.greetingService = greetingService;
+  }
 
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+  }
 
-    @BeforeEach
-    void clean() {
-        todoRepository.deleteAll();
-    }
+  @BeforeEach
+  void clean() {
+    todoRepository.deleteAll();
+  }
 
-    @Test
-    void should_include_number_of_open_todos_in_greeting() {
-        // given
-        todoService.createTodo("Buy bolt pistols", "For the squad", false, "marine");
-        todoService.createTodo("Bless the lasgun", "With machine oil", true, "techpriest");
-        todoService.createTodo("Charge plasma cell", "Don't overheat!", false, "marine");
+  @Test
+  void should_include_number_of_open_todos_in_greeting() {
+    // given
+    todoService.createTodo("Buy bolt pistols", "For the squad", false, "marine");
+    todoService.createTodo("Bless the lasgun", "With machine oil", true, "techpriest");
+    todoService.createTodo("Charge plasma cell", "Don't overheat!", false, "marine");
 
-        // when
-        String message = greetingService.greet();
+    // when
+    String message = greetingService.greet();
 
-        // then
-        assertThat(message).contains("Hello").contains("2 open tasks");
-    }
+    // then
+    assertThat(message).contains("Hello").contains("2 open tasks");
+  }
 
-    @Test
-    void should_return_zero_open_tasks_message_if_none_exist() {
-        // given
-        todoService.createTodo("Pray to the Machine God", "Every morning", true, "techpriest");
+  @Test
+  void should_return_zero_open_tasks_message_if_none_exist() {
+    // given
+    todoService.createTodo("Pray to the Machine God", "Every morning", true, "techpriest");
 
-        // when
-        String message = greetingService.greet();
+    // when
+    String message = greetingService.greet();
 
-        // then
-        assertThat(message).contains("Hello").contains("0 open tasks");
-    }
+    // then
+    assertThat(message).contains("Hello").contains("0 open tasks");
+  }
 
-    @Test
-    void should_work_with_no_todos_at_all() {
-        // when
-        String message = greetingService.greet();
+  @Test
+  void should_work_with_no_todos_at_all() {
+    // when
+    String message = greetingService.greet();
 
-        // then
-        assertThat(message).contains("Hello").contains("0 open tasks");
-    }
+    // then
+    assertThat(message).contains("Hello").contains("0 open tasks");
+  }
 
-    @Test
-    void should_ignore_null_todos_or_null_completed_flags() {
-        // given
-        Todo manualTodo =
-                new Todo(null, "Strange one", "no completed flag", false, "ghost", "ghost", null, null);
+  @Test
+  void should_ignore_null_todos_or_null_completed_flags() {
+    // given
+    Todo manualTodo =
+        new Todo(null, "Strange one", "no completed flag", false, "ghost", "ghost", null, null);
 
-        todoRepository.saveAll(List.of(manualTodo));
+    todoRepository.saveAll(List.of(manualTodo));
 
-        // when
-        String message = greetingService.greet();
+    // when
+    String message = greetingService.greet();
 
-        // then
-        assertThat(message).contains("1 open task");
-    }
+    // then
+    assertThat(message).contains("1 open task");
+  }
 }
