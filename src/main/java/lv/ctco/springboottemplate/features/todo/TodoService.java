@@ -54,6 +54,13 @@ public class TodoService {
     return todoRepository.save(todo);
   }
 
+  public Todo createTodo(
+      String title, String description, boolean completed, String createdBy, Instant createdAt) {
+    var todo =
+        new Todo(null, title, description, completed, createdBy, createdBy, createdAt, createdAt);
+    return todoRepository.save(todo);
+  }
+
   public Optional<Todo> updateTodo(
       String id, String title, String description, boolean completed, String updatedBy) {
     return todoRepository
