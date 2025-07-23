@@ -10,7 +10,7 @@
 | Task Description                     | Time Spent |
 |--------------------------------------|------------|
 | Environment setup (IDE, Gradle, JDK) | 1.5h       |
-| 1st task implementation              | 0.5h       |
+| 1st task implementation              | 1.5h       |
 
 ---
 
