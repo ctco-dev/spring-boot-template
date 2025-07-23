@@ -14,7 +14,7 @@
 
 ---
 
-**🧮 Total Time:** 2.0 hours
+**🧮 Total Time:** 3.0 hours
 
 ---
 
