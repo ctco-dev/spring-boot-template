@@ -13,8 +13,8 @@ public class GreetingService {
   private static final String GREETING_TEMPLATE = "Hello from Spring! You have %d open %s.";
 
   public String greet() {
-    int count = countTodos();
-    String taskWord = (count == 1) ? "task" : "tasks";
+    final int count = countTodos();
+    final String taskWord = (count == 1) ? "task" : "tasks";
     return String.format(GREETING_TEMPLATE, count, taskWord);
   }
 
