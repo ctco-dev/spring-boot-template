@@ -1,7 +1,15 @@
 package lv.ctco.springboottemplate.features.greeting;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lv.ctco.springboottemplate.common.MongoDbContainerTestSupport;
+import lv.ctco.springboottemplate.features.todo.Todo;
+import lv.ctco.springboottemplate.features.todo.TodoRepository;
 import lv.ctco.springboottemplate.features.todo.TodoService;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -11,34 +19,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  *
  * <p>This test verifies that GreetingService correctly interacts with {@link TodoService} and
  * reflects the number of open (not completed) todos in the message.
- *
- * <p>Initially marked {@link Disabled} to be enabled by the developer after implementation.
  */
+@RequiredArgsConstructor
 @SpringBootTest
-@Disabled("Enable after implementing GreetingService using TodoService")
 @Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class GreetingServiceIntegrationTest {
-
-  /*
-
-  @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
-
-  @DynamicPropertySource
-  static void setProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-  }
-
+class GreetingServiceIntegrationTest extends MongoDbContainerTestSupport {
   private final TodoService todoService;
   private final TodoRepository todoRepository;
   private final GreetingService greetingService;
-
-  GreetingServiceIntegrationTest(
-      TodoService todoService, TodoRepository todoRepository, GreetingService greetingService) {
-    this.todoService = todoService;
-    this.todoRepository = todoRepository;
-    this.greetingService = greetingService;
-  }
 
   @BeforeEach
   void clean() {
@@ -92,7 +81,6 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("1 open task");
+    assertThat(message).contains("1 open task.");
   }
-  */
 }
