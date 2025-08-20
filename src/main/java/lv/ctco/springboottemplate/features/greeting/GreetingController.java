@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/greeting")
 @Tag(name = "Greeting Controller", description = "Greeting endpoint")
 public class GreetingController {
-    private final GreetingService greetingService;
+  private final GreetingService greetingService;
 
-    public GreetingController(GreetingService greetingService) {
-        this.greetingService = greetingService;
-    }
+  public GreetingController(GreetingService greetingService) {
+    this.greetingService = greetingService;
+  }
 
-    @GetMapping
-    @Operation(summary = "Get greeting message")
-    public String getAllTodos() {
-        return greetingService.greet();
-    }
+  @GetMapping
+  @Operation(summary = "Get greeting message")
+  public String getAllTodos() {
+    return greetingService.greet();
+  }
 }
