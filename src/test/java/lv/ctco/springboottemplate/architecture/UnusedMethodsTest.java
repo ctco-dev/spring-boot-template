@@ -42,6 +42,8 @@ public class UnusedMethodsTest {
                     item.getMethods().stream()
                         .filter(method -> !isSpringLifecycleMethod(method))
                         .filter(method -> method.getAccessesToSelf().isEmpty())
+                            // added to fix test, there may be a better way to handle this though
+                        .filter(method -> !isValidatorIsValidMethod(item, method))
                         .forEach(
                             method ->
                                 events.add(
@@ -58,6 +60,13 @@ public class UnusedMethodsTest {
                         || method.getName().equals("destroy")
                         || method.getName().equals("afterPropertiesSet")
                         || method.getName().startsWith("set");
+                  }
+
+                  private boolean isValidatorIsValidMethod(JavaClass classItem, JavaMethod method) {
+                    return method.getName().equals("isValid")
+                        && classItem.getAllRawInterfaces().stream()
+                            .anyMatch(
+                                i -> i.getName().equals("jakarta.validation.ConstraintValidator"));
                   }
                 })
             .because(
