@@ -42,7 +42,7 @@ public class UnusedMethodsTest {
                     item.getMethods().stream()
                         .filter(method -> !isSpringLifecycleMethod(method))
                         .filter(method -> method.getAccessesToSelf().isEmpty())
-                            // added to fix test, there may be a better way to handle this though
+                        // added to fix test, there may be a better way to handle this though
                         .filter(method -> !isValidatorIsValidMethod(item, method))
                         .forEach(
                             method ->
