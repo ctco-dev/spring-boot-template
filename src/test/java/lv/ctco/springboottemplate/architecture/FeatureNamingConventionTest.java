@@ -35,6 +35,8 @@ public class FeatureNamingConventionTest {
             .haveSimpleNameStartingWith("Todo")
             .orShould()
             .haveSimpleNameStartingWith("Greeting")
+            .orShould()
+            .haveSimpleNameStartingWith("Statistics")
             .because(
                 """
             The 'features' package should contain only top-level components like:
