@@ -1,6 +1,8 @@
 package lv.ctco.springboottemplate.features.statistics;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDate;
@@ -26,9 +28,19 @@ public class StatisticsController {
   @GetMapping
   @Operation(summary = "Get todo statistics")
   public ResponseEntity<Statistics> getStatistics(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> from,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> to,
-      @RequestParam @StatisticsFormat String format) {
+      @Parameter(description = "Start date. Format: YYYY-MM-DD", example = "2023-01-01")
+          @RequestParam
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          Optional<LocalDate> from,
+      @Parameter(description = "End date. Format: YYYY-MM-DD", example = "2023-12-31")
+          @RequestParam
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          Optional<LocalDate> to,
+      @Parameter(description = "Response format", example = "summary")
+          @Schema(allowableValues = {"summary", "detailed"})
+          @RequestParam
+          @StatisticsFormat
+          String format) {
     return ResponseEntity.ok(statisticsService.getStatisticsSummary(from, to, format));
   }
 
