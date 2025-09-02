@@ -42,6 +42,8 @@ public class UnusedStaticMethodsTest {
             .areNotAnnotatedWith(Repository.class)
             .and()
             .areNotAnnotatedWith(RestController.class)
+            .and()
+            .areNotEnums() // Exclude enums from the rule
             .should(
                 new ArchCondition<>("have all non-private static methods used") {
                   @Override
@@ -50,6 +52,16 @@ public class UnusedStaticMethodsTest {
                         .filter(method -> method.getModifiers().contains(JavaModifier.STATIC))
                         .filter(method -> !method.getModifiers().contains(JavaModifier.PRIVATE))
                         .filter(method -> method.getAccessesToSelf().isEmpty())
+                        .filter(
+                            method ->
+                                !(item.isEnum()
+                                    && method.getOwner().isEnum()
+                                    && (method.getName().equals("values")
+                                        || method
+                                            .getName()
+                                            .equals(
+                                                "valueOf")))) // Ensure exclusion of enum-generated
+                        // methods
                         .forEach(
                             method ->
                                 events.add(
