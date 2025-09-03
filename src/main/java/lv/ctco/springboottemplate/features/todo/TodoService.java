@@ -50,7 +50,7 @@ public class TodoService {
 
   public Todo createTodo(String title, String description, boolean completed, String createdBy) {
     var now = Instant.now();
-    var todo = new Todo(null, title, description, completed, createdBy, createdBy, now, now);
+    var todo = new Todo(null, title, description, completed, createdBy, createdBy, now, now, null);
     return todoRepository.save(todo);
   }
 
@@ -69,7 +69,8 @@ public class TodoService {
                       existingTodo.createdBy(),
                       updatedBy,
                       existingTodo.createdAt(),
-                      Instant.now());
+                      Instant.now(),
+                      completed ? Instant.now() : existingTodo.completedAt());
               return todoRepository.save(updatedTodo);
             });
   }
