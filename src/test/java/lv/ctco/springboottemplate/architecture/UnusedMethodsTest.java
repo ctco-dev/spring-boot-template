@@ -12,6 +12,7 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class UnusedMethodsTest {
                   @Override
                   public void check(JavaClass item, ConditionEvents events) {
                     item.getMethods().stream()
-                        .filter(method -> !isSpringLifecycleMethod(method))
+                        .filter(method -> !isFrameworkLifecycleMethod(method))
                         .filter(method -> method.getAccessesToSelf().isEmpty())
                         .forEach(
                             method ->
@@ -53,11 +54,18 @@ public class UnusedMethodsTest {
                                             method.getName(), item.getName()))));
                   }
 
-                  private boolean isSpringLifecycleMethod(JavaMethod method) {
-                    return method.getName().equals("init")
-                        || method.getName().equals("destroy")
-                        || method.getName().equals("afterPropertiesSet")
-                        || method.getName().startsWith("set");
+                  private boolean isFrameworkLifecycleMethod(JavaMethod method) {
+                    String name = method.getName();
+                    JavaClass owner = method.getOwner();
+
+                    // Spring Converter<T,U>
+                    if (owner.isAssignableTo(Converter.class) && name.equals("convert")) {
+                      return true;
+                    }
+
+                    // ...other framework hooks
+
+                    return false;
                   }
                 })
             .because(
