@@ -7,10 +7,10 @@ import lv.ctco.springboottemplate.features.todo_statistics.validators.TodoStatis
 
 @TodoStatisticsValidDateRange
 public class TodoStatisticsRequest {
-  @Parameter(example = "2024-03-15T10:30:00Z")
+  @Parameter(example = "2025-09-01T10:30:00Z")
   private Instant from;
 
-  @Parameter(example = "2024-03-20T23:59:59Z")
+  @Parameter(example = "2025-10-01T23:59:59Z")
   private Instant to;
 
   @Parameter(example = "summary")
