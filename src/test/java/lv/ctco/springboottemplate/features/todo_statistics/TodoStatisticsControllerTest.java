@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,6 +27,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class TodoStatisticsControllerTest {
 
   @Container static MongoDBContainer mongo = new MongoDBContainer("mongo:7.0");
+
+  @DynamicPropertySource
+  static void mongoProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+  }
 
   private final TestRestTemplate restTemplate;
   private final int port;
