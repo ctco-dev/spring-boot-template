@@ -1,4 +1,4 @@
-package lv.ctco.springboottemplate.features.todo_statistics;
+package lv.ctco.springboottemplate.errorhandling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class TodoStatisticsExceptionHandler {
-  @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+public class ExceptionHandler {
+  @org.springframework.web.bind.annotation.ExceptionHandler({
+    MethodArgumentNotValidException.class,
+    BindException.class
+  })
   public ResponseEntity<Map<String, Object>> handleValidationExceptions(Exception ex) {
     List<String> errors = new ArrayList<>();
 
@@ -33,7 +35,7 @@ public class TodoStatisticsExceptionHandler {
         .body(Map.of("status", 400, "error", "Bad Request", "messages", errors));
   }
 
-  @ExceptionHandler(RuntimeException.class)
+  @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
   public ResponseEntity<Map<String, String>> handleServerError(RuntimeException ex) {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(Map.of("error", "Internal server error", "details", ex.getMessage()));

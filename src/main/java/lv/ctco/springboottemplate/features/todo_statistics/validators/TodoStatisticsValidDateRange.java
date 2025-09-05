@@ -1,5 +1,7 @@
 package lv.ctco.springboottemplate.features.todo_statistics.validators;
 
+import static lv.ctco.springboottemplate.errorhandling.ErrorMessages.TODO_STATS_DATE_RANGE_INVALID;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
@@ -9,8 +11,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = TodoStatisticsDateRangeValidator.class)
 @Documented
 public @interface TodoStatisticsValidDateRange {
-  String message() default
-      "Either from, to, or both can pe provided. 'from' date must be before or equal to 'to' date";
+  String message() default TODO_STATS_DATE_RANGE_INVALID;
 
   Class<?>[] groups() default {};
 

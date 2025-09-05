@@ -53,7 +53,7 @@ public class TodoStatisticsService {
       dto.setPendingTodos(pending);
       dto.setUserStats(userStats);
 
-      if (request.getFormat().equals(TodoStatisticsFormatEnum.detailed)) {
+      if (request.getFormat().equals(TodoStatisticsFormatEnum.DETAILED)) {
         dto.setTodos(todosMap);
       }
 
@@ -72,7 +72,7 @@ public class TodoStatisticsService {
     Instant finalFrom = (from != null) ? from : finalTo.minus(7, ChronoUnit.DAYS);
 
     TodoStatisticsFormatEnum format =
-        Objects.requireNonNullElse(request.getFormat(), TodoStatisticsFormatEnum.summary);
+        Objects.requireNonNullElse(request.getFormat(), TodoStatisticsFormatEnum.SUMMARY);
     request.setFrom(finalFrom);
     request.setTo(finalTo);
     request.setFormat(format);

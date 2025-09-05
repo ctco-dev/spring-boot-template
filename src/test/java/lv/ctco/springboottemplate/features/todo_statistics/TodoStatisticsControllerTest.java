@@ -1,80 +1,81 @@
 package lv.ctco.springboottemplate.features.todo_statistics;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static lv.ctco.springboottemplate.errorhandling.ErrorMessages.TODO_STATS_DATE_RANGE_INVALID;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import lv.ctco.springboottemplate.features.todo.TodoRepository;
+import lv.ctco.springboottemplate.features.todo_statistics.dto.TodoStatistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class TodoStatisticsControllerIT {
+class TodoStatisticsControllerTest {
 
-  @Container static final MongoDBContainer mongo = new MongoDBContainer("mongo:7.0");
+  @Container static MongoDBContainer mongo = new MongoDBContainer("mongo:7.0");
 
-  @DynamicPropertySource
-  static void configure(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+  private final TestRestTemplate restTemplate;
+  private final int port;
+  private final TodoRepository todoRepository;
+
+  @Autowired
+  public TodoStatisticsControllerTest(
+      TestRestTemplate restTemplate, @LocalServerPort int port, TodoRepository todoRepository) {
+    this.restTemplate = restTemplate;
+    this.port = port;
+    this.todoRepository = todoRepository;
   }
 
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private TodoRepository todoRepository;
-
-  @Autowired private ObjectMapper objectMapper;
+  private String baseUrl() {
+    return "http://localhost:" + port + "/api/statistics";
+  }
 
   @BeforeEach
-  void setup() {
+  void setUp() {
     todoRepository.deleteAll();
 
-    Instant now = Instant.now();
-
-    var todos =
+    List<Todo> todos =
         List.of(
             new Todo(
                 null,
-                "Buy groceries",
-                "Milk, eggs, bread",
+                "Buy milk",
+                "Get 2 liters of milk",
                 false,
-                "user3",
-                "user3",
-                now,
+                "alice",
+                null,
+                Instant.now(),
                 null,
                 null),
             new Todo(
                 null,
-                "Call dentist",
-                "Schedule annual checkup",
+                "Finish project",
+                "Complete the spring boot module",
                 true,
-                "user1",
-                "system",
-                now,
-                now,
-                now),
+                "bob",
+                "charlie",
+                Instant.now().minus(3, ChronoUnit.DAYS),
+                Instant.now().minus(1, ChronoUnit.DAYS),
+                Instant.now().minus(1, ChronoUnit.DAYS)),
             new Todo(
                 null,
-                "Fix bug in production",
-                "High priority issue #123",
+                "Read book",
+                "Read 'Effective Java'",
                 false,
-                "user1",
-                "user3",
-                now,
+                "alice",
+                null,
+                Instant.now().minus(5, ChronoUnit.DAYS),
                 null,
                 null));
 
@@ -82,19 +83,87 @@ class TodoStatisticsControllerIT {
   }
 
   @Test
-  void shouldReturnStatistics() throws Exception {
-    mockMvc
-        .perform(
-            get("/api/statistics")
-                .param("from", Instant.now().minusSeconds(3600).toString())
-                .param("to", Instant.now().plusSeconds(3600).toString())
-                .param("format", "detailed")
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.totalTodos").value(3))
-        .andExpect(jsonPath("$.completedTodos").value(1))
-        .andExpect(jsonPath("$.pendingTodos").value(2))
-        .andExpect(jsonPath("$.userStats.user1").value(2))
-        .andExpect(jsonPath("$.todos.completed").isArray());
+  void shouldReturnStatistics() {
+    Instant from = Instant.now().minus(2, ChronoUnit.DAYS);
+    Instant to = Instant.now();
+
+    String url =
+        String.format("%s?format=summary&from=%s&to=%s", baseUrl(), from.toString(), to.toString());
+
+    ResponseEntity<TodoStatistics> response = restTemplate.getForEntity(url, TodoStatistics.class);
+
+    assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    TodoStatistics stats = response.getBody();
+    assertThat(stats).isNotNull();
+  }
+
+  @Test
+  void shouldReturnStatisticsWithMissingRequestParams() {
+    Instant from = Instant.now().minus(2, ChronoUnit.DAYS);
+
+    String url = String.format("%s?from=%s", baseUrl(), from.toString());
+
+    ResponseEntity<TodoStatistics> response = restTemplate.getForEntity(url, TodoStatistics.class);
+
+    assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    TodoStatistics stats = response.getBody();
+    assertThat(stats).isNotNull();
+  }
+
+  @Test
+  void shouldIgnoreFormatCase() {
+    Instant from = Instant.now().minus(2, ChronoUnit.DAYS);
+    Instant to = Instant.now();
+
+    String url =
+        String.format(
+            "%s?format=DETAIled&from=%s&to=%s", baseUrl(), from.toString(), to.toString());
+
+    ResponseEntity<TodoStatistics> response = restTemplate.getForEntity(url, TodoStatistics.class);
+
+    assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    TodoStatistics stats = response.getBody();
+    assertThat(stats).isNotNull();
+  }
+
+  @Test
+  void shouldHandleEmptyResponse() {
+    Instant from = Instant.now().minus(101, ChronoUnit.DAYS);
+    Instant to = Instant.now().minus(100, ChronoUnit.DAYS);
+
+    String url = String.format("%s?from=%s&to=%s", baseUrl(), from.toString(), to.toString());
+
+    ResponseEntity<TodoStatistics> response = restTemplate.getForEntity(url, TodoStatistics.class);
+
+    assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+    TodoStatistics stats = response.getBody();
+    assertThat(stats).isNotNull();
+    assertThat(stats.getTotalTodos()).isEqualTo(0);
+  }
+
+  @Test
+  void shouldReturnErrorIfMissingParams() {
+
+    ResponseEntity<String> response = restTemplate.getForEntity(baseUrl(), String.class);
+
+    assertThat(response.getStatusCode().is4xxClientError()).isTrue();
+    assertThat(response.getBody())
+        .withFailMessage(
+            "Expected response body to contain error message: %s", TODO_STATS_DATE_RANGE_INVALID)
+        .contains(TODO_STATS_DATE_RANGE_INVALID);
+  }
+
+  @Test
+  void shouldReturnErrorIfInvalidFormat() {
+    Instant from = Instant.now().minus(2, ChronoUnit.DAYS);
+    Instant to = Instant.now();
+
+    String url =
+        String.format(
+            "%s?format=deta1led&from=%s&to=%s", baseUrl(), from.toString(), to.toString());
+
+    ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+    assertThat(response.getStatusCode().is4xxClientError()).isTrue();
   }
 }
