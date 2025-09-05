@@ -50,7 +50,17 @@ public class TodoService {
 
   public Todo createTodo(String title, String description, boolean completed, String createdBy) {
     var now = Instant.now();
-    var todo = new Todo(null, title, description, completed, createdBy, createdBy, now, now, null);
+    var todo =
+        new Todo(
+            null,
+            title,
+            description,
+            completed,
+            createdBy,
+            createdBy,
+            now,
+            now,
+            completed ? Instant.now() : null);
     return todoRepository.save(todo);
   }
 

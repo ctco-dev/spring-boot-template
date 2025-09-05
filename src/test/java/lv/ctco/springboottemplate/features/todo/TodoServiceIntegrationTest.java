@@ -63,6 +63,7 @@ class TodoServiceIntegrationTest {
     assertThat(todo.updatedBy()).isEqualTo(createdBy);
     assertThat(todo.createdAt()).isNotNull();
     assertThat(todo.updatedAt()).isNotNull();
+    assertThat(todo.completedAt()).isNull();
   }
 
   @Test
@@ -84,6 +85,7 @@ class TodoServiceIntegrationTest {
     assertThat(updated.createdBy()).isEqualTo("creator");
     assertThat(updated.updatedBy()).isEqualTo("updater");
     assertThat(updated.updatedAt()).isAfter(created.updatedAt());
+    assertThat(updated.completedAt()).isNotNull();
   }
 
   @Test
