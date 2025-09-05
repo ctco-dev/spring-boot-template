@@ -12,6 +12,7 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,14 @@ public class UnusedMethodsTest {
                   }
 
                   private boolean isSpringLifecycleMethod(JavaMethod method) {
-                    return method.getName().equals("init")
-                        || method.getName().equals("destroy")
-                        || method.getName().equals("afterPropertiesSet")
-                        || method.getName().startsWith("set");
+                    String name = method.getName();
+                    JavaClass owner = method.getOwner();
+
+                    return name.equals("init")
+                        || name.equals("destroy")
+                        || name.equals("afterPropertiesSet")
+                        || name.startsWith("set")
+                        || owner.isAssignableTo(Converter.class) && name.equals("convert");
                   }
                 })
             .because(
