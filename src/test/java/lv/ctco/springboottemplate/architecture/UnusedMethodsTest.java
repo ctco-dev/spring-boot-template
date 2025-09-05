@@ -41,7 +41,7 @@ public class UnusedMethodsTest {
                   @Override
                   public void check(JavaClass item, ConditionEvents events) {
                     item.getMethods().stream()
-                        .filter(method -> !isFrameworkLifecycleMethod(method))
+                        .filter(method -> !isSpringLifecycleMethod(method))
                         .filter(method -> method.getAccessesToSelf().isEmpty())
                         .forEach(
                             method ->
@@ -54,18 +54,15 @@ public class UnusedMethodsTest {
                                             method.getName(), item.getName()))));
                   }
 
-                  private boolean isFrameworkLifecycleMethod(JavaMethod method) {
+                  private boolean isSpringLifecycleMethod(JavaMethod method) {
                     String name = method.getName();
                     JavaClass owner = method.getOwner();
 
-                    // Spring Converter<T,U>
-                    if (owner.isAssignableTo(Converter.class) && name.equals("convert")) {
-                      return true;
-                    }
-
-                    // ...other framework hooks
-
-                    return false;
+                    return name.equals("init")
+                        || name.equals("destroy")
+                        || name.equals("afterPropertiesSet")
+                        || name.startsWith("set")
+                        || owner.isAssignableTo(Converter.class) && name.equals("convert");
                   }
                 })
             .because(
