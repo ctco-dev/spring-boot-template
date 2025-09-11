@@ -63,7 +63,7 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("Hello").contains("2 open tasks");
+    assertThat(message).contains("Hello").contains("2 open tasks.");
   }
 
   @Test
@@ -75,7 +75,7 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("Hello").contains("0 open tasks");
+    assertThat(message).contains("Hello").contains("0 open tasks.");
   }
 
   @Test
@@ -84,7 +84,7 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("Hello").contains("0 open tasks");
+    assertThat(message).contains("Hello").contains("0 open tasks.");
   }
 
   @Test
@@ -99,6 +99,6 @@ class GreetingServiceIntegrationTest {
     String message = greetingService.greet();
 
     // then
-    assertThat(message).contains("1 open task");
+    assertThat(message).contains("1 open task.");
   }
 }

@@ -18,7 +18,7 @@ public class GreetingController {
 
   @GetMapping
   @Operation(summary = "Get greeting message")
-  public String getOpenTasksCount() {
+  public String getGreeting() {
     return greetingService.greet();
   }
 }
