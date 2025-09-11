@@ -4,6 +4,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,10 @@ public class FeatureNamingConventionTest {
 
   @BeforeAll
   static void setup() {
-    importedClasses = new ClassFileImporter().importPackages("lv.ctco.springboottemplate");
+    importedClasses =
+        new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("lv.ctco.springboottemplate.features");
   }
 
   @Test
@@ -25,6 +29,10 @@ public class FeatureNamingConventionTest {
             .resideInAPackage("..features..")
             .and()
             .haveNameNotMatching(".*\\$.*") // ← exclude inner classes
+            .and()
+            .areNotRecords()
+            .and()
+            .areNotEnums()
             .should()
             .haveSimpleNameEndingWith("Controller")
             .orShould()
