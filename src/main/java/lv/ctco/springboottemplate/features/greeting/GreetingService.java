@@ -12,7 +12,10 @@ public class GreetingService {
   }
 
   public String greet() {
-    var openTasksCount = todoService.getAllTodos().stream().filter(todo -> !todo.completed()).count();
-    return String.format("Hello from Spring! You have %d open %s.", openTasksCount, openTasksCount == 1 ? "task" : "tasks");
+    var openTasksCount =
+        todoService.getAllTodos().stream().filter(todo -> !todo.completed()).count();
+    return String.format(
+        "Hello from Spring! You have %d open %s.",
+        openTasksCount, openTasksCount == 1 ? "task" : "tasks");
   }
 }
