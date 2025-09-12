@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class StatisticsFormatValidator implements ConstraintValidator<StatisticsFormat, String> {
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    return value.equals("summary") || value.equals("detailed");
+    return "summary".equals(value) || "detailed".equals(value);
   }
 }

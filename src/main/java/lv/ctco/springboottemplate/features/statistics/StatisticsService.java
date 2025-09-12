@@ -22,9 +22,13 @@ public class StatisticsService {
     this.mongoTemplate = mongoTemplate;
   }
 
-  public Statistics getStatisticsSummary(
-      Optional<LocalDate> from, Optional<LocalDate> to, String format) {
-    Document result = getTodosStatisticsAggregation(from, to, format).getUniqueMappedResult();
+  public Statistics getStatistics(
+      Optional<LocalDate> from, Optional<LocalDate> to, StatisticsFormats format) {
+    boolean isSummary = StatisticsFormats.SUMMARY.equals(format);
+    Document result =
+        isSummary
+            ? getSummaryStatisticsAggregation(from, to).getUniqueMappedResult()
+            : getDetailedStatisticsAggregation(from, to).getUniqueMappedResult();
 
     int totalTodos = getTodoCount(result, "totalTodos");
     int completedTodos = getTodoCount(result, "completedTodos");
@@ -32,7 +36,7 @@ public class StatisticsService {
 
     Map<String, Integer> userStats = getUserStats(result);
 
-    if (format.equals("summary")) {
+    if (isSummary) {
       return new Statistics(totalTodos, completedTodos, pendingTodos, userStats, Optional.empty());
     }
 
@@ -41,52 +45,46 @@ public class StatisticsService {
     return new Statistics(totalTodos, completedTodos, pendingTodos, userStats, Optional.of(todos));
   }
 
-  private AggregationResults<Document> getTodosStatisticsAggregation(
-      Optional<LocalDate> from, Optional<LocalDate> to, String format) {
-    MatchOperation matchTodosInRange = matchDateRange(from, to);
-    MatchOperation matchCompletedTodos = match(where("completed").is(true));
-    MatchOperation matchPendingTodos = match(where("completed").is(false));
-
-    GroupOperation countTodos = group().count().as("count");
-    GroupOperation countTodosPerUser = group("createdBy").count().as("count");
-
+  private AggregationResults<Document> getDetailedStatisticsAggregation(
+      Optional<LocalDate> from, Optional<LocalDate> to) {
     ProjectionOperation projectPendingFields = project("id", "title", "createdBy", "createdAt");
     ProjectionOperation projectCompletedFields =
         projectPendingFields.andExpression("updatedAt").as("completedAt");
 
-    FacetOperation summaryFacet =
-        facet(countTodos)
-            .as("totalTodos")
-            .and(matchCompletedTodos, countTodos)
-            .as("completedTodos")
-            .and(matchPendingTodos, countTodos)
-            .as("pendingTodos")
-            .and(countTodosPerUser)
-            .as("userStats");
-
     FacetOperation detailsFacet =
-        facet(countTodos)
+        facet(countTodos())
             .as("totalTodos")
-            .and(matchCompletedTodos, countTodos)
+            .and(matchTodosByCompletedState(true), countTodos())
             .as("completedTodos")
-            .and(matchPendingTodos, countTodos)
+            .and(matchTodosByCompletedState(false), countTodos())
             .as("pendingTodos")
-            .and(countTodosPerUser)
+            .and(countTodosPerUser())
             .as("userStats")
-            .and(matchPendingTodos, projectPendingFields)
+            .and(matchTodosByCompletedState(false), projectPendingFields)
             .as("pending")
-            .and(matchCompletedTodos, projectCompletedFields)
+            .and(matchTodosByCompletedState(true), projectCompletedFields)
             .as("completed");
 
-    Aggregation summaryAggregation = newAggregation(matchTodosInRange, summaryFacet);
+    Aggregation detailedAggregation = newAggregation(matchDateRange(from, to), detailsFacet);
 
-    Aggregation detailedAggregation = newAggregation(matchTodosInRange, detailsFacet);
+    return this.mongoTemplate.aggregate(detailedAggregation, "todos", Document.class);
+  }
 
-    if (Objects.equals(format, "summary")) {
-      return this.mongoTemplate.aggregate(summaryAggregation, "todos", Document.class);
-    } else {
-      return this.mongoTemplate.aggregate(detailedAggregation, "todos", Document.class);
-    }
+  private AggregationResults<Document> getSummaryStatisticsAggregation(
+      Optional<LocalDate> from, Optional<LocalDate> to) {
+    FacetOperation summaryFacet =
+        facet(countTodos())
+            .as("totalTodos")
+            .and(matchTodosByCompletedState(true), countTodos())
+            .as("completedTodos")
+            .and(matchTodosByCompletedState(false), countTodos())
+            .as("pendingTodos")
+            .and(countTodosPerUser())
+            .as("userStats");
+
+    Aggregation summaryAggregation = newAggregation(matchDateRange(from, to), summaryFacet);
+
+    return this.mongoTemplate.aggregate(summaryAggregation, "todos", Document.class);
   }
 
   private MatchOperation matchDateRange(Optional<LocalDate> from, Optional<LocalDate> to) {
@@ -100,6 +98,18 @@ public class StatisticsService {
                 (c1, c2) ->
                     c1.getCriteriaObject().isEmpty() ? c2 : new Criteria().andOperator(c1, c2));
     return Aggregation.match(criteria);
+  }
+
+  private MatchOperation matchTodosByCompletedState(boolean completed) {
+    return match(where("completed").is(completed));
+  }
+
+  private GroupOperation countTodos() {
+    return group().count().as("count");
+  }
+
+  private GroupOperation countTodosPerUser() {
+    return group("createdBy").count().as("count");
   }
 
   private int getTodoCount(Document result, String key) {
