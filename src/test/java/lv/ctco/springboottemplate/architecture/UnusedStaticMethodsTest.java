@@ -42,6 +42,9 @@ public class UnusedStaticMethodsTest {
             .areNotAnnotatedWith(Repository.class)
             .and()
             .areNotAnnotatedWith(RestController.class)
+            // Enum.valueOf is static and public so it fails the test
+            .and()
+            .areNotAssignableTo(Enum.class)
             .should(
                 new ArchCondition<>("have all non-private static methods used") {
                   @Override
