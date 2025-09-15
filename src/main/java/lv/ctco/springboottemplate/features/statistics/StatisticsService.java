@@ -1,12 +1,10 @@
 package lv.ctco.springboottemplate.features.statistics;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lv.ctco.springboottemplate.features.statistics.dto.StatsFormatEnum;
 import lv.ctco.springboottemplate.features.statistics.dto.TodoBreakdownDTO;
@@ -23,58 +21,54 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StatisticsService {
 
-    private final MongoTemplate mongoTemplate;
-    private final TodoRepository todoRepository;
+  private final MongoTemplate mongoTemplate;
+  private final TodoRepository todoRepository;
 
-    public TodoStatsResponseDTO query(
-            Optional<LocalDate> from, Optional<LocalDate> to, StatsFormatEnum format) {
-        Criteria criteria = Criteria.where("createdAt");
-        ;
+  public TodoStatsResponseDTO query(
+      Optional<LocalDate> from, Optional<LocalDate> to, StatsFormatEnum format) {
+    Criteria criteria = Criteria.where("createdAt");
+    ;
 
-        if (from.isPresent()) criteria = criteria.gte(from.get());
-        if (to.isPresent()) criteria = criteria.lte(to.get());
+    if (from.isPresent()) criteria = criteria.gte(from.get());
+    if (to.isPresent()) criteria = criteria.lte(to.get());
 
-        Query query = new Query(criteria);
+    Query query = new Query(criteria);
 
-        List<Todo> todos = mongoTemplate.find(query, Todo.class);
+    List<Todo> todos = mongoTemplate.find(query, Todo.class);
 
-        return buildSummaryFromTodos(todos, format);
-    }
+    return buildSummaryFromTodos(todos, format);
+  }
 
-    private TodoStatsResponseDTO buildSummaryFromTodos(List<Todo> todos, StatsFormatEnum format) {
-        int total = todos.size();
-        int completed = (int) todos.stream().filter(Todo::completed).count();
-        int pending = total - completed;
+  private TodoStatsResponseDTO buildSummaryFromTodos(List<Todo> todos, StatsFormatEnum format) {
+    int total = todos.size();
+    int completed = (int) todos.stream().filter(Todo::completed).count();
+    int pending = total - completed;
 
-        List<TodoItemDTO> completedList = todos.stream()
-                .filter(Todo::completed)
-                .map(this::toDto)
-                .toList();
+    List<TodoItemDTO> completedList =
+        todos.stream().filter(Todo::completed).map(this::toDto).toList();
 
-        List<TodoItemDTO> pendingList = todos.stream()
-                .filter(t -> !t.completed())
-                .map(this::toDto)
-                .toList();
+    List<TodoItemDTO> pendingList =
+        todos.stream().filter(t -> !t.completed()).map(this::toDto).toList();
 
-        Map<String, Integer> userStats =
-                todos.stream()
-                        .collect(Collectors.groupingBy(Todo::createdBy, Collectors.summingInt(t -> 1)));
+    Map<String, Integer> userStats =
+        todos.stream()
+            .collect(Collectors.groupingBy(Todo::createdBy, Collectors.summingInt(t -> 1)));
 
+    TodoBreakdownDTO breakdown = new TodoBreakdownDTO(completedList, pendingList);
+    return new TodoStatsResponseDTO(
+        total,
+        completed,
+        pending,
+        userStats,
+        format == StatsFormatEnum.DETAILED ? Optional.of(breakdown) : Optional.empty());
+  }
 
-        TodoBreakdownDTO breakdown = new TodoBreakdownDTO(completedList, pendingList);
-        return new TodoStatsResponseDTO(
-                total, completed, pending, userStats, format == StatsFormatEnum.DETAILED ? Optional.of(breakdown) : Optional.empty()
-        );
-    }
-
-    private TodoItemDTO toDto(Todo todo) {
-        return new TodoItemDTO(
-                todo.id(),
-                todo.title(),
-                todo.createdBy(),
-                todo.createdAt(),
-                todo.completed() ? todo.updatedAt() : null
-        );
-    }
-
+  private TodoItemDTO toDto(Todo todo) {
+    return new TodoItemDTO(
+        todo.id(),
+        todo.title(),
+        todo.createdBy(),
+        todo.createdAt(),
+        todo.completed() ? todo.updatedAt() : null);
+  }
 }

@@ -10,5 +10,4 @@ public record TodoStatsResponseDTO(
     int completedTodos,
     int pendingTodos,
     Map<String, Integer> userStats,
-    Optional<TodoBreakdownDTO> todos
-    ) {}
+    Optional<TodoBreakdownDTO> todos) {}
