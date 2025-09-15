@@ -9,6 +9,6 @@ public record TodoStatsResponseDTO(
     int totalTodos,
     int completedTodos,
     int pendingTodos,
-    Map<String, Integer> userStats, // custom user input stats
-    Optional<TodoBreakdownDTO> todos // will be empty for summary response
+    Map<String, Integer> userStats,
+    Optional<TodoBreakdownDTO> todos
     ) {}

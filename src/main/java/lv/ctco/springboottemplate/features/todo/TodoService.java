@@ -48,11 +48,31 @@ public class TodoService {
     return todoRepository.findByTitleContainingIgnoreCase(title);
   }
 
-  public Todo createTodo(String title, String description, boolean completed, String createdBy) {
-    var now = Instant.now();
-    var todo = new Todo(null, title, description, completed, createdBy, createdBy, now, now);
-    return todoRepository.save(todo);
-  }
+    public Todo createTodo(String title, String description, boolean completed, String createdBy) {
+        return createTodo(title, description, completed, createdBy, null, null);
+    }
+
+    public Todo createTodo(
+            String title,
+            String description,
+            boolean completed,
+            String createdBy,
+            Instant createdAt,
+            Instant updatedAt) {
+
+        var now = Instant.now();
+        var todo = new Todo(
+                null,
+                title,
+                description,
+                completed,
+                createdBy,
+                createdBy,
+                createdAt != null ? createdAt : now,
+                updatedAt != null ? updatedAt : now
+        );
+        return todoRepository.save(todo);
+    }
 
   public Optional<Todo> updateTodo(
       String id, String title, String description, boolean completed, String updatedBy) {

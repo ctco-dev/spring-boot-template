@@ -9,5 +9,5 @@ public record TodoItemDTO(
     String title,
     String createdBy,
     Instant createdAt,
-    Instant completedAt // only present for completed todos
+    Instant completedAt
     ) {}
