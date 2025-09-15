@@ -23,16 +23,23 @@ public class StatisticsController {
   @GetMapping
   @Operation(summary = "Get Insights About Todo Items")
   public Boolean getInsightsAboutTodoItems(
-    @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @io.swagger.v3.oas.annotations.Parameter(
+    @RequestParam() @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @io.swagger.v3.oas.annotations.Parameter(
       description = "2025-01-01",
       schema = @io.swagger.v3.oas.annotations.media.Schema(type = "string", pattern = "\\d{4}-\\d{2}-\\d{2}", example = "2025-01-01")
     ) LocalDate from,
-    @RequestParam(required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @io.swagger.v3.oas.annotations.Parameter(
+    @RequestParam() @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @io.swagger.v3.oas.annotations.Parameter(
       description = "2025-01-31",
       schema = @io.swagger.v3.oas.annotations.media.Schema(type = "string", pattern = "\\d{4}-\\d{2}-\\d{2}", example = "2025-01-31")
     ) LocalDate to,
     @RequestParam(required = true) StatisticsFormat format
   ) {
+    if (from == null || to == null) {
+      throw new org.springframework.web.server.ResponseStatusException(
+        org.springframework.http.HttpStatus.BAD_REQUEST,
+        "At least one of the required parameters 'from' or 'to' is missing"
+      );
+    }
+
     if (from.isAfter(to)) {
       throw new org.springframework.web.server.ResponseStatusException(
         org.springframework.http.HttpStatus.BAD_REQUEST,
