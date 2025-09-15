@@ -77,9 +77,10 @@ Open Swagger docs: http://localhost:8080/swagger-ui.html
 3. **Pull Request Process**
    - Create a PR from your task branch to your personal feature branch
    - Assign the following reviewers to your PR:
-     - https://github.com/trioletas
-     - https://github.com/algorithm108
-     - https://github.com/IgorGursky
+     - https://github.com/trioletas (Oleg)
+     - https://github.com/algorithm108 (Alexey)
+     - https://github.com/IgorGursky (Igor)
+     - https://github.com/Melancholic (Andrey)
 
 ### 📝 Available Tasks
 
