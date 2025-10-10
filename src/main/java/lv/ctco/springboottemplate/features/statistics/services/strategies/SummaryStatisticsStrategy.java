@@ -46,7 +46,7 @@ class SummaryStatisticsStrategy extends AbstractStatisticsStrategy {
         if (root != null) {
             List<Document> counts = getArray(root, "counts");
             if (!counts.isEmpty()) {
-                Document first = counts.get(0);
+                Document first = counts.getFirst();
                 total = first.getInteger("total", 0);
                 completed = first.getInteger("completed", 0);
             }

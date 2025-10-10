@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticsController {
     private final StatisticsService statisticsService;
 
-    public StatisticsController(StatisticsService statisticsService, StatisticsQueryBuilder queryBuilder) {
+    public StatisticsController(StatisticsService statisticsService) {
         this.statisticsService = statisticsService;
     }
 
