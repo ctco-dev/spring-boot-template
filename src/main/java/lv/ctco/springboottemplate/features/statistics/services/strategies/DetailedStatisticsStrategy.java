@@ -1,27 +1,28 @@
 package lv.ctco.springboottemplate.features.statistics.services.strategies;
 
 import lv.ctco.springboottemplate.features.statistics.models.*;
+import lv.ctco.springboottemplate.features.statistics.services.StatisticsRepository;
 import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static lv.ctco.springboottemplate.features.statistics.StatisticsAggregationUtil.extractUserStats;
+import static lv.ctco.springboottemplate.features.statistics.StatisticsAggregationUtil.getArray;
+
 @Component
-class DetailedStatisticsStrategy extends AbstractStatisticsStrategy {
+class DetailedStatisticsStrategy implements StatisticsComputationStrategy {
 
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_INSTANT;
+    private final StatisticsRepository repository;
 
-    DetailedStatisticsStrategy(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+    DetailedStatisticsStrategy(StatisticsRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -31,20 +32,7 @@ class DetailedStatisticsStrategy extends AbstractStatisticsStrategy {
 
     @Override
     public StatisticsResponse compute(StatisticsQuery query) {
-        ProjectionOperation projectTodosFields = Aggregation.project("title", "createdBy", "createdAt", "updatedAt", "completed", "completedAt");
-        Aggregation agg = Aggregation.newAggregation(
-                matchDateFilter(query),
-                Aggregation.facet(
-                                Aggregation.group()
-                                        .count().as("total")
-                                        .sum(ConditionalOperators.when(Criteria.where("completed").is(true)).then(1).otherwise(0)).as("completed")
-                        ).as("counts")
-                        .and(Aggregation.group("createdBy").count().as("count")).as("userStats")
-                        .and(Aggregation.match(Criteria.where("completed").is(true)), projectTodosFields).as("completedTodosSource")
-                        .and(Aggregation.match(Criteria.where("completed").is(false)), projectTodosFields).as("pendingTodosSource")
-        );
-
-        Document root = aggregateSingle(agg);
+        Document root = repository.executeDetailed(query);
         int total = 0;
         int completed = 0;
         if (root != null) {
@@ -56,8 +44,7 @@ class DetailedStatisticsStrategy extends AbstractStatisticsStrategy {
             }
         }
         int pending = total - completed;
-
-        var userStats = extractUserStats(root);
+        Map<String, Integer> userStats = extractUserStats(root);
 
         List<TodosStatistics> completedTodos = Optional.ofNullable(root)
                 .map(r -> getArray(r, "completedTodosSource")).orElse(List.of()).stream()
@@ -87,8 +74,12 @@ class DetailedStatisticsStrategy extends AbstractStatisticsStrategy {
         Instant completedAt = isCompleted ? Optional.ofNullable(toInstant(d.get("completedAt")))
                 .or(() -> Optional.ofNullable(toInstant(d.get("updatedAt"))))
                 .orElse(null) : null;
-
         return new TodosStatistics(id, title, createdBy, createdAt, Optional.ofNullable(completedAt));
     }
-}
 
+    private Instant toInstant(Object obj) {
+        if (obj instanceof java.util.Date date) return date.toInstant();
+        if (obj instanceof Instant inst) return inst;
+        return null;
+    }
+}

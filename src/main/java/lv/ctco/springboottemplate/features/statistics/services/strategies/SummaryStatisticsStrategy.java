@@ -4,21 +4,23 @@ import lv.ctco.springboottemplate.features.statistics.models.StatisticsFormat;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsQuery;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsResponse;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsSummaryResponse;
+import lv.ctco.springboottemplate.features.statistics.services.StatisticsRepository;
 import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
-@Component
-class SummaryStatisticsStrategy extends AbstractStatisticsStrategy {
+import static lv.ctco.springboottemplate.features.statistics.StatisticsAggregationUtil.extractUserStats;
+import static lv.ctco.springboottemplate.features.statistics.StatisticsAggregationUtil.getArray;
 
-    SummaryStatisticsStrategy(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+@Component
+class SummaryStatisticsStrategy implements StatisticsComputationStrategy {
+
+    private final StatisticsRepository repository;
+
+    SummaryStatisticsStrategy(StatisticsRepository repository) {
+        this.repository = repository;
     }
 
     @Override
@@ -28,19 +30,7 @@ class SummaryStatisticsStrategy extends AbstractStatisticsStrategy {
 
     @Override
     public StatisticsResponse compute(StatisticsQuery query) {
-        Aggregation agg = Aggregation.newAggregation(
-                matchDateFilter(query),
-                Aggregation.facet(
-                                Aggregation.group()
-                                        .count().as("total")
-                                        .sum(ConditionalOperators.when(Criteria.where("completed").is(true)).then(1).otherwise(0)).as("completed")
-                        ).as("counts")
-                        .and(
-                                Aggregation.group("createdBy").count().as("count")
-                        ).as("userStats")
-        );
-
-        Document root = aggregateSingle(agg);
+        Document root = repository.executeSummary(query);
         int total = 0;
         int completed = 0;
         if (root != null) {
@@ -53,8 +43,6 @@ class SummaryStatisticsStrategy extends AbstractStatisticsStrategy {
         }
         int pending = total - completed;
         Map<String, Integer> userStats = extractUserStats(root);
-
         return new StatisticsSummaryResponse(total, completed, pending, userStats);
     }
 }
-
