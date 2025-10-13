@@ -12,12 +12,12 @@ public class GreetingService {
     }
 
     public String greet() {
-        var activeTodos = todoService
+        var activeTodosCount = todoService
                 .getAllTodos()
                 .stream()
                 .filter(todo -> !todo.completed())
-                .toList();
+                .count();
 
-        return "Hello from Spring! You have " + activeTodos.size() + " open tasks.";
+        return String.format("Hello from Spring! You have %d open tasks.", activeTodosCount);
     }
 }
