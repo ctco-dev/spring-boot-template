@@ -17,8 +17,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 /**
  * Integration test for {@link GreetingService} without Testcontainers.
  *
- * <p>This test uses a locally running MongoDB instance (expected at mongodb://localhost:27017/tododb).
- * If you prefer an embedded/in-memory Mongo, add flapdoodle dependency and remove the dynamic property below.
+ * <p>This test uses a locally running MongoDB instance (expected at
+ * mongodb://localhost:27017/tododb). If you prefer an embedded/in-memory Mongo, add flapdoodle
+ * dependency and remove the dynamic property below.
  */
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
