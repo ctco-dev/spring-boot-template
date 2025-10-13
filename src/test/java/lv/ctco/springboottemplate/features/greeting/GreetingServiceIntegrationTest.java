@@ -76,10 +76,10 @@ class GreetingServiceIntegrationTest {
   @Test
   void should_work_with_no_todos_at_all() {
     // when
-    String message = greetingService.greet();
+    String msg = greetingService.greet();
 
     // then
-    assertThat(message).contains("Hello").contains("0 open tasks");
+    assertThat(msg).contains("Hello").contains("0 open tasks");
   }
 
   @Test

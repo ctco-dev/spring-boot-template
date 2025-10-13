@@ -12,7 +12,7 @@ public class GreetingService {
   }
 
   public String greet() {
-    var activeTodosCount =
+    long activeTodosCount =
             todoService.getAllTodos().stream().filter(todo -> !todo.completed()).count();
 
     return String.format("Hello from Spring! You have %d open tasks.", activeTodosCount);

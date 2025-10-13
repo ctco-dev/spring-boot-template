@@ -40,11 +40,11 @@ class TodoServiceIntegrationTest {
 
     // when
     todoService.createTodo(title, description, completed, createdBy);
-    List<Todo> allTodos = todoService.getAllTodos();
+    List<Todo> todos = todoService.getAllTodos();
 
     // then
-    assertThat(allTodos).hasSize(1);
-    Todo todo = allTodos.getFirst();
+    assertThat(todos).hasSize(1);
+    Todo todo = todos.getFirst();
 
     assertThat(todo.id()).isNotNull();
     assertThat(todo.title()).isEqualTo(title);
