@@ -1,38 +1,29 @@
 package lv.ctco.springboottemplate.features.todo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestConstructor;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Testcontainers
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class TodoServiceIntegrationTest {
-
-  @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
 
   @DynamicPropertySource
   static void setProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+    registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/tododb");
   }
 
+  @Autowired
   private TodoRepository todoRepository;
 
+  @Autowired
   private TodoService todoService;
-
-  public TodoServiceIntegrationTest(TodoRepository todoRepository, TodoService todoService) {
-    this.todoRepository = todoRepository;
-    this.todoService = todoService;
-  }
 
   @BeforeEach
   void setup() {
@@ -48,12 +39,12 @@ class TodoServiceIntegrationTest {
     String createdBy = "test-user";
 
     // when
-    Todo created = todoService.createTodo(title, description, completed, createdBy);
-    List<Todo> allTodos = todoService.getAllTodos();
+    todoService.createTodo(title, description, completed, createdBy);
+    List<Todo> todos = todoService.getAllTodos();
 
     // then
-    assertThat(allTodos).hasSize(1);
-    Todo todo = allTodos.get(0);
+    assertThat(todos).hasSize(1);
+    Todo todo = todos.getFirst();
 
     assertThat(todo.id()).isNotNull();
     assertThat(todo.title()).isEqualTo(title);
@@ -110,6 +101,6 @@ class TodoServiceIntegrationTest {
 
     // then
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).title()).containsIgnoringCase("milk");
+    assertThat(result.getFirst().title()).containsIgnoringCase("milk");
   }
 }
