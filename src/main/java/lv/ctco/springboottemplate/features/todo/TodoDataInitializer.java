@@ -58,7 +58,26 @@ public class TodoDataInitializer {
                   "system",
                   "system",
                   now,
-                  now));
+                  now),
+              new Todo(
+                      null,
+                      "Plan Task 2",
+                      "Research mongo aggregates",
+                      true,
+                      "warlock",
+                      "warlock",
+                      now,
+                      now),
+                  new Todo(
+                          null,
+                          "Task 2 detailed dto",
+                          "Research mongo aggregates",
+                          false,
+                          "warlock",
+                          "warlock",
+                          now,
+                          now)
+                  );
 
       todoRepository.saveAll(todos);
       log.info("Initialized database with {} todo items", todos.size());

@@ -6,20 +6,21 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/statistics")
 @Tag(name = "Todo Controller", description = "Todo management endpoints")
 public class StatisticsController {
 
-    public StatisticsController() {
+    private final StatisticsService statisticsService;
+
+    public StatisticsController(StatisticsService statisticsService) {
+        this.statisticsService = statisticsService;
     }
 
     @GetMapping
     @Operation(summary = "Get todo statistics")
-    // @Todo - implement correct return dto
-    public List<String> getStatistics(
+    public TodoSummaryStatsDto getStatistics(
             @Nullable @RequestParam(name = "from", required = false) LocalDate from,
             @Nullable @RequestParam(name = "to", required = false) LocalDate to,
             @RequestParam ResponseFormat format) {
@@ -28,6 +29,6 @@ public class StatisticsController {
             throw new RuntimeException("Either 'from' or 'to' should be provided");
         }
 
-        return List.of();
+        return statisticsService.getStatistics();
     }
 }
