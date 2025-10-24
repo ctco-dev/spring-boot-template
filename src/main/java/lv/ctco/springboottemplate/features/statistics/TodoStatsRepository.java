@@ -39,19 +39,7 @@ public class TodoStatsRepository {
     }
 
     public TodoDetailedStatsDto getExpandedStats() {
-        long total = mongoTemplate.count(new Query(), Todo.class);
-        long completed = mongoTemplate.count(Query.query(Criteria.where("completed").is(true)), Todo.class);
-        long pending = total - completed;
-
-        // Aggregate user stats
-        Aggregation agg = Aggregation.newAggregation(
-                Aggregation.group("createdBy").count().as("count")
-        );
-        AggregationResults<Document> results = mongoTemplate.aggregate(agg, "todos", Document.class);
-        Map<String, Long> userStats = new HashMap<>();
-        for (Document doc : results.getMappedResults()) {
-            userStats.put(doc.getString("_id"), ((Number) doc.get("count")).longValue());
-        }
+        TodoSummaryStatsDto summaryStats = getStats();
 
         // Fetch completed todos
         List<CompletedTodo> completedTodos = mongoTemplate.find(
@@ -81,10 +69,10 @@ public class TodoStatsRepository {
                 .toList();
 
         return new TodoDetailedStatsDto(
-                total,
-                completed,
-                pending,
-                userStats,
+                summaryStats.totalTodos(),
+                summaryStats.completedTodos(),
+                summaryStats.pendingTodos(),
+                summaryStats.userStats(),
                 new TodoDetails(completedTodos, pendingTodos)
         );
     }
