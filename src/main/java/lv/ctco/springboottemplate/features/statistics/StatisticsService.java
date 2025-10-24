@@ -13,4 +13,8 @@ public class StatisticsService {
   public TodoSummaryStatsDto getStatistics() {
       return todoStatsRepository.getStats();
   }
+
+    public TodoDetailedStatsDto getExpandedStatistics() {
+        return todoStatsRepository.getExpandedStats();
+    }
 }

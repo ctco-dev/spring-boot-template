@@ -31,4 +31,18 @@ public class StatisticsController {
 
         return statisticsService.getStatistics();
     }
+
+    @GetMapping("/expanded")
+    @Operation(summary = "Get todo statistics")
+    public TodoSummaryStatsDto getExpandedStatistics(
+            @Nullable @RequestParam(name = "from", required = false) LocalDate from,
+            @Nullable @RequestParam(name = "to", required = false) LocalDate to,
+            @RequestParam ResponseFormat format) {
+
+        if (from == null && to == null) {
+            throw new RuntimeException("Either 'from' or 'to' should be provided");
+        }
+
+        return statisticsService.getExpandedStatistics();
+    }
 }
