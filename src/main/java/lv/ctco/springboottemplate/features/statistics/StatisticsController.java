@@ -34,7 +34,7 @@ public class StatisticsController {
 
     @GetMapping("/expanded")
     @Operation(summary = "Get todo statistics")
-    public TodoSummaryStatsDto getExpandedStatistics(
+    public TodoDetailedStatsDto getExpandedStatistics(
             @Nullable @RequestParam(name = "from", required = false) LocalDate from,
             @Nullable @RequestParam(name = "to", required = false) LocalDate to,
             @RequestParam ResponseFormat format) {
