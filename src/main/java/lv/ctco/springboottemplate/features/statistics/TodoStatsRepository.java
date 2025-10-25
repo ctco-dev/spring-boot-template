@@ -41,32 +41,24 @@ public class TodoStatsRepository {
     public TodoDetailedStatsDto getExpandedStats() {
         TodoSummaryStatsDto summaryStats = getStats();
 
-        // Fetch completed todos
-        List<CompletedTodo> completedTodos = mongoTemplate.find(
-                        Query.query(Criteria.where("completed").is(true)),
-                        Todo.class
-                ).stream()
-                .map(todo -> new CompletedTodo(
-                        todo.id(),
-                        todo.title(),
-                        todo.createdBy(),
-                        todo.createdAt(),
-                        todo.updatedAt() // assuming updatedAt = completedAt
-                ))
-                .toList();
+        Query queryCompleted = new Query(Criteria.where("completed").is(true));
+        queryCompleted.fields()
+                .include("id")
+                .include("title")
+                .include("createdBy")
+                .include("createdAt")
+                .include("completedAt");
 
-        // Fetch pending todos
-        List<PendingTodo> pendingTodos = mongoTemplate.find(
-                        Query.query(Criteria.where("completed").is(false)),
-                        Todo.class
-                ).stream()
-                .map(todo -> new PendingTodo(
-                        todo.id(),
-                        todo.title(),
-                        todo.createdBy(),
-                        todo.createdAt()
-                ))
-                .toList();
+        List<CompletedTodo> completedTodos = mongoTemplate.find(queryCompleted, CompletedTodo.class, "todos");
+
+        Query queryPending = new Query(Criteria.where("completed").is(false));
+        queryPending.fields()
+                .include("id")
+                .include("title")
+                .include("createdBy")
+                .include("createdAt");
+
+        List<PendingTodo> pendingTodos = mongoTemplate.find(queryPending, PendingTodo.class, "todos");
 
         return new TodoDetailedStatsDto(
                 summaryStats.totalTodos(),
