@@ -1,5 +1,6 @@
 package lv.ctco.springboottemplate.features.statistics;
 
+import lv.ctco.springboottemplate.features.statistics.dto.*;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -49,7 +50,7 @@ public class TodoStatsRepository {
                 .include("createdAt")
                 .include("completedAt");
 
-        List<CompletedTodo> completedTodos = mongoTemplate.find(queryCompleted, CompletedTodo.class, "todos");
+        List<CompletedTodoDto> completedTodos = mongoTemplate.find(queryCompleted, CompletedTodoDto.class, "todos");
 
         Query queryPending = new Query(Criteria.where("completed").is(false));
         queryPending.fields()
@@ -58,14 +59,14 @@ public class TodoStatsRepository {
                 .include("createdBy")
                 .include("createdAt");
 
-        List<PendingTodo> pendingTodos = mongoTemplate.find(queryPending, PendingTodo.class, "todos");
+        List<PendingTodoDto> pendingTodos = mongoTemplate.find(queryPending, PendingTodoDto.class, "todos");
 
         return new TodoDetailedStatsDto(
                 summaryStats.totalTodos(),
                 summaryStats.completedTodos(),
                 summaryStats.pendingTodos(),
                 summaryStats.userStats(),
-                new TodoDetails(completedTodos, pendingTodos)
+                new TodoDetailsDto(completedTodos, pendingTodos)
         );
     }
 }

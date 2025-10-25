@@ -1,5 +1,7 @@
 package lv.ctco.springboottemplate.features.statistics;
 
+import lv.ctco.springboottemplate.features.statistics.dto.TodoDetailedStatsDto;
+import lv.ctco.springboottemplate.features.statistics.dto.TodoSummaryStatsDto;
 import org.springframework.stereotype.Service;
 
 @Service

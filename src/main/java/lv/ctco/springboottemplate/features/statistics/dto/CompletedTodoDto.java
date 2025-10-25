@@ -1,8 +1,8 @@
-package lv.ctco.springboottemplate.features.statistics;
+package lv.ctco.springboottemplate.features.statistics.dto;
 
 import java.time.Instant;
 
-public record CompletedTodo(
+public record CompletedTodoDto(
         String id,
         String title,
         String createdBy,

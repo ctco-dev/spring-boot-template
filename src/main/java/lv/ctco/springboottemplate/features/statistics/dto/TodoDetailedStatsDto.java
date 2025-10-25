@@ -1,6 +1,4 @@
-package lv.ctco.springboottemplate.features.statistics;
-
-import org.springframework.lang.Nullable;
+package lv.ctco.springboottemplate.features.statistics.dto;
 
 import java.util.Map;
 
@@ -9,6 +7,6 @@ public record TodoDetailedStatsDto(
         long completedTodos,
         long pendingTodos,
         Map<String, Long> userStats,
-        TodoDetails todos
-) {}
+        TodoDetailsDto todos
+) implements TodoStatsDto {}
 

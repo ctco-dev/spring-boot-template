@@ -1,8 +1,8 @@
-package lv.ctco.springboottemplate.features.statistics;
+package lv.ctco.springboottemplate.features.statistics.dto;
 
 import java.time.Instant;
 
-public record PendingTodo(
+public record PendingTodoDto(
         String id,
         String title,
         String createdBy,
