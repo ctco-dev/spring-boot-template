@@ -43,6 +43,8 @@ public class TodoStatsRepository {
     public TodoDetailedStatsDto getExpandedStats() {
         TodoSummaryStatsDto summaryStats = getStats();
 
+        aggregateTets();
+
         Aggregation aggregateCompleted = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("completed").is(true)),
                 Aggregation.project()
@@ -73,5 +75,44 @@ public class TodoStatsRepository {
                 summaryStats.userStats(),
                 new TodoDetailsDto(completedTodos, pendingTodos)
         );
+    }
+
+    public record TodoDetailsAggregateDocuments(List<Document> completed, List<Document> pending) {
+    }
+
+    TodoDetailsDto aggregateTets() {
+
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.facet(
+                                Aggregation.match(Criteria.where("completed").is(true)),
+                                Aggregation.project()
+                                        .and("_id").as("id")
+                                        .and("title").as("title")
+                                        .and("createdBy").as("createdBy")
+                                        .and("createdAt").as("createdAt")
+                                        .and("updatedAt").as("completedAt")
+                        ).as("completed")
+                        .and(
+                                Aggregation.match(Criteria.where("completed").is(false)),
+                                Aggregation.project()
+                                        .and("_id").as("id")
+                                        .and("title").as("title")
+                                        .and("createdBy").as("createdBy")
+                                        .and("createdAt").as("createdAt")
+                        ).as("pending")
+        );
+
+        AggregationResults<TodoDetailsAggregateDocuments> result = mongoTemplate.aggregate(agg, "todos", TodoDetailsAggregateDocuments.class);
+        TodoDetailsAggregateDocuments raw = result.getUniqueMappedResult();
+
+        List<CompletedTodoDto> completedTodos = raw.completed().stream()
+                .map(doc -> mongoTemplate.getConverter().read(CompletedTodoDto.class, doc))
+                .toList();
+
+        List<PendingTodoDto> pendingTodos = raw.pending().stream()
+                .map(doc -> mongoTemplate.getConverter().read(PendingTodoDto.class, doc))
+                .toList();
+
+        return new TodoDetailsDto(completedTodos, pendingTodos);
     }
 }
