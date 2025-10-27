@@ -1,11 +1,13 @@
 package lv.ctco.springboottemplate.features.greeting;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import java.util.List;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import lv.ctco.springboottemplate.features.todo.TodoRepository;
 import lv.ctco.springboottemplate.features.todo.TodoService;
 import lv.ctco.springboottemplate.greeting.GreetingService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -15,24 +17,18 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 /**
  * Integration test for {@link GreetingService}.
  *
  * <p>This test verifies that GreetingService correctly interacts with {@link TodoService} and
  * reflects the number of open (not completed) todos in the message.
- *
  */
 @SpringBootTest
 @Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class GreetingServiceIntegrationTest {
 
-  @Container
-  static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
+  @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
 
   @DynamicPropertySource
   static void setProperties(DynamicPropertyRegistry registry) {
