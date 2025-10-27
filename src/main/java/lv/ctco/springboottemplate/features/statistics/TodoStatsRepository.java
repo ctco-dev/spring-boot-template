@@ -15,6 +15,7 @@ import org.bson.Document;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @Repository
 public class TodoStatsRepository {
 
@@ -42,15 +43,19 @@ public class TodoStatsRepository {
     public TodoDetailedStatsDto getExpandedStats() {
         TodoSummaryStatsDto summaryStats = getStats();
 
-        Query queryCompleted = new Query(Criteria.where("completed").is(true));
-        queryCompleted.fields()
-                .include("id")
-                .include("title")
-                .include("createdBy")
-                .include("createdAt")
-                .include("completedAt");
+        Aggregation aggregateCompleted = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("completed").is(true)),
+                Aggregation.project()
+                        .and("_id").as("id")
+                        .and("title").as("title")
+                        .and("createdBy").as("createdBy")
+                        .and("createdAt").as("createdAt")
+                        .and("updatedAt").as("completedAt")
+        );
 
-        List<CompletedTodoDto> completedTodos = mongoTemplate.find(queryCompleted, CompletedTodoDto.class, "todos");
+        List<CompletedTodoDto> completedTodos = mongoTemplate
+                .aggregate(aggregateCompleted, "todos", CompletedTodoDto.class)
+                .getMappedResults();
 
         Query queryPending = new Query(Criteria.where("completed").is(false));
         queryPending.fields()
