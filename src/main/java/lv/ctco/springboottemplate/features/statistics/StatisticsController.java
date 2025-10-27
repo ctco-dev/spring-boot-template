@@ -6,7 +6,9 @@ import lv.ctco.springboottemplate.features.statistics.dto.TodoStatsDto;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 @RestController
 @RequestMapping("/api/statistics")
@@ -29,10 +31,10 @@ public class StatisticsController {
             throw new RuntimeException("Either 'from' or 'to' should be provided");
         }
 
-        if (format == ResponseFormat.SUMMARY) {
-            return statisticsService.getStatistics();
-        } else {
-            return statisticsService.getExpandedStatistics();
-        }
+        Instant fromInstant = from == null ? null : from.atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant toInstant = to == null ? null : to.atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        return statisticsService.getStatistics(format, fromInstant, toInstant);
+
     }
 }
