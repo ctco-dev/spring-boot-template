@@ -21,11 +21,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.junit.jupiter.Testcontainers;
+
+// import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
+// @Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class StatisticsControllerTest {
   private final MockMvc mockMvc;
