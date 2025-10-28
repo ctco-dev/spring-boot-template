@@ -1,9 +1,8 @@
 package lv.ctco.springboottemplate.features.statistics;
 
+import java.time.Instant;
 import lv.ctco.springboottemplate.features.statistics.dto.TodoStatsDto;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 
 @Service
 public class StatisticsService {
@@ -14,6 +13,6 @@ public class StatisticsService {
   }
 
   public TodoStatsDto getStatistics(ResponseFormat format, Instant from, Instant to) {
-      return todoStatsRepository.getStats(format, from, to);
+    return todoStatsRepository.getStats(format, from, to);
   }
 }

@@ -3,9 +3,4 @@ package lv.ctco.springboottemplate.features.statistics.dto;
 import java.time.Instant;
 
 public record CompletedTodoDto(
-        String id,
-        String title,
-        String createdBy,
-        Instant createdAt,
-        Instant completedAt
-) {}
+    String id, String title, String createdBy, Instant createdAt, Instant completedAt) {}
