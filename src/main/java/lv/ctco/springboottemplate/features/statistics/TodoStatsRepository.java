@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import lv.ctco.springboottemplate.features.statistics.dto.*;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,7 +13,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TodoStatsRepository {
 
-  @Autowired private MongoTemplate mongoTemplate;
+  private final MongoTemplate mongoTemplate;
+
+  public TodoStatsRepository(MongoTemplate mongoTemplate) {
+    this.mongoTemplate = mongoTemplate;
+  }
 
   Aggregation getSummaryStatsAggregation(ResponseFormat format, Instant from, Instant to) {
     Criteria criteria = new Criteria();

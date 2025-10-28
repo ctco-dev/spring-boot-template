@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import lv.ctco.springboottemplate.features.statistics.dto.TodoStatsDto;
+import lv.ctco.springboottemplate.features.statistics.dto.ResponseFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +22,25 @@ public class StatisticsController {
 
   @GetMapping
   @Operation(summary = "Get todo statistics")
-  public TodoStatsDto getStatistics(
+  public ResponseEntity<Object> getStatistics(
       @Nullable @RequestParam(name = "from", required = false) LocalDate from,
       @Nullable @RequestParam(name = "to", required = false) LocalDate to,
-      @RequestParam ResponseFormat format) {
+      @RequestParam(name = "format") String formatString) {
+
+    ResponseFormat format = ResponseFormat.SUMMARY;
+    try {
+      format = ResponseFormat.valueOf(formatString.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body("Method parameter 'format': Failed to convert");
+    }
 
     if (from == null && to == null) {
-      throw new RuntimeException("Either 'from' or 'to' should be provided");
+      return ResponseEntity.badRequest().body("Either 'from' or 'to' should be provided");
     }
 
     Instant fromInstant = from == null ? null : from.atStartOfDay(ZoneOffset.UTC).toInstant();
     Instant toInstant = to == null ? null : to.atStartOfDay(ZoneOffset.UTC).toInstant();
 
-    return statisticsService.getStatistics(format, fromInstant, toInstant);
+    return ResponseEntity.ok(statisticsService.getStatistics(format, fromInstant, toInstant));
   }
 }

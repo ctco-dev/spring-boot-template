@@ -1,4 +1,4 @@
-package lv.ctco.springboottemplate.features.statistics;
+package lv.ctco.springboottemplate.features.statistics.dto;
 
 public enum ResponseFormat {
   SUMMARY("summary"),

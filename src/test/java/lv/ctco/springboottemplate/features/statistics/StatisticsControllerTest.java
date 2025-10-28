@@ -12,15 +12,13 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import lv.ctco.springboottemplate.config.ResponseFormatConverter;
 import lv.ctco.springboottemplate.features.statistics.dto.TodoStatsDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestConstructor;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -28,12 +26,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
-@Import(ResponseFormatConverter.class)
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class StatisticsControllerTest {
+  private final MockMvc mockMvc;
 
-  @Autowired private MockMvc mockMvc;
+  private final ObjectMapper objectMapper;
 
-  @Autowired private ObjectMapper objectMapper;
+  public StatisticsControllerTest(ObjectMapper objectMapper, MockMvc mockMvc) {
+    this.objectMapper = objectMapper;
+    this.mockMvc = mockMvc;
+  }
 
   DateTimeFormatter formatter =
       DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
