@@ -1,11 +1,13 @@
 package lv.ctco.springboottemplate.features.statistics;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import lv.ctco.springboottemplate.features.statistics.dto.ResponseFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +25,28 @@ public class StatisticsController {
   @GetMapping
   @Operation(summary = "Get todo statistics")
   public ResponseEntity<Object> getStatistics(
-      @Nullable @RequestParam(name = "from", required = false) LocalDate from,
-      @Nullable @RequestParam(name = "to", required = false) LocalDate to,
-      @RequestParam(name = "format") String formatString) {
+      @Parameter(description = "From date in ISO format (yyyy-MM-dd)")
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          @Nullable
+          @RequestParam(name = "from", required = false)
+          LocalDate from,
+      @Parameter(description = "To date in ISO format (yyyy-MM-dd)")
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          @Nullable
+          @RequestParam(name = "to", required = false)
+          LocalDate to,
+      @Parameter(
+              description =
+                  """
+                     Response format. **Allowed values**:<br>
+                           - `summary`: returns overview information.<br>
+                           - `detailed`: returns overview information and separate complete and pending Todos.
+                    """,
+              example = "summary")
+          @RequestParam(name = "format")
+          String formatString) {
 
-    ResponseFormat format = ResponseFormat.SUMMARY;
+    ResponseFormat format;
     try {
       format = ResponseFormat.valueOf(formatString.toUpperCase());
     } catch (IllegalArgumentException e) {
