@@ -1,6 +1,7 @@
 package lv.ctco.springboottemplate.features.todo;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ public class TodoDataInitializer {
       todoRepository.deleteAll(); // Clear existing data
 
       var now = Instant.now();
+      var oldInstant = Instant.now().minus(10L, ChronoUnit.DAYS);
+
       var todos =
           List.of(
               new Todo(
@@ -58,7 +61,34 @@ public class TodoDataInitializer {
                   "system",
                   "system",
                   now,
-                  now));
+                  now),
+              new Todo(
+                  null,
+                  "Plan Task 2",
+                  "Research mongo aggregates",
+                  true,
+                  "warlock",
+                  "warlock",
+                  now,
+                  now),
+              new Todo(
+                  null,
+                  "Task 2 detailed dto",
+                  "Research mongo aggregates",
+                  false,
+                  "warlock",
+                  "warlock",
+                  now,
+                  now),
+              new Todo(
+                  null,
+                  "Task 2 - learn basics",
+                  "Research various java techniques",
+                  true,
+                  "warlock",
+                  "warlock",
+                  oldInstant,
+                  oldInstant));
 
       todoRepository.saveAll(todos);
       log.info("Initialized database with {} todo items", todos.size());
