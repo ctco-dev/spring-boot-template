@@ -12,13 +12,7 @@ public class GreetingService {
   }
 
   public String greet() {
-    long pendingCount =
-        todoService.getAllTodos().stream()
-            .filter(
-                t -> {
-                  return !t.completed();
-                })
-            .count();
+    long pendingCount = todoService.getAllTodos().stream().filter(t -> !t.completed()).count();
 
     return "Hello from Spring! You have " + pendingCount + " open tasks.";
   }
