@@ -39,12 +39,12 @@ class TodoServiceIntegrationTest {
     String createdBy = "test-user";
 
     // when
-    Todo created = todoService.createTodo(title, description, completed, createdBy);
-    List<Todo> allTodos = todoService.getAllTodos();
+    todoService.createTodo(title, description, completed, createdBy);
+    List<Todo> todos = todoService.getAllTodos();
 
     // then
-    assertThat(allTodos).hasSize(1);
-    Todo todo = allTodos.get(0);
+    assertThat(todos).hasSize(1);
+    Todo todo = todos.getFirst();
 
     assertThat(todo.id()).isNotNull();
     assertThat(todo.title()).isEqualTo(title);
@@ -101,6 +101,6 @@ class TodoServiceIntegrationTest {
 
     // then
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).title()).containsIgnoringCase("milk");
+    assertThat(result.getFirst().title()).containsIgnoringCase("milk");
   }
 }

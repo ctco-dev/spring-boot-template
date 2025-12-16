@@ -17,8 +17,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 /**
  * Integration test for {@link GreetingService} without Testcontainers.
  *
- * <p>This test uses a locally running MongoDB instance (expected at mongodb://localhost:27017/tododb).
- * If you prefer an embedded/in-memory Mongo, add flapdoodle dependency and remove the dynamic property below.
+ * <p>This test uses a locally running MongoDB instance (expected at
+ * mongodb://localhost:27017/tododb). If you prefer an embedded/in-memory Mongo, add flapdoodle
+ * dependency and remove the dynamic property below.
  */
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -75,10 +76,10 @@ class GreetingServiceIntegrationTest {
   @Test
   void should_work_with_no_todos_at_all() {
     // when
-    String message = greetingService.greet();
+    String msg = greetingService.greet();
 
     // then
-    assertThat(message).contains("Hello").contains("0 open tasks");
+    assertThat(msg).contains("Hello").contains("0 open tasks");
   }
 
   @Test
