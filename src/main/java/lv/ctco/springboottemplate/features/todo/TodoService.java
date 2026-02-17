@@ -81,4 +81,16 @@ public class TodoService {
     }
     return false;
   }
+
+  public List<Todo> getTodosByCreatedAtRange(Instant from, Instant to) {
+    if (from != null && to != null) {
+      return todoRepository.findByCreatedAtBetween(from, to);
+    } else if (from != null) {
+      return todoRepository.findByCreatedAtGreaterThanEqual(from);
+    } else if (to != null) {
+      return todoRepository.findByCreatedAtLessThanEqual(to);
+    }
+
+    return todoRepository.findAll();
+  }
 }
