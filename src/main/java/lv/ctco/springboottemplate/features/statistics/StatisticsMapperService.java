@@ -10,10 +10,10 @@ import lv.ctco.springboottemplate.features.statistics.models.StatisticsTodosDto;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class StatisticsMapper {
+@Service
+public class StatisticsMapperService {
 
   public StatisticsSummaryDto toSummary(AggregationResults<Document> results) {
     long total = 0L;

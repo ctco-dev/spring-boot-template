@@ -23,13 +23,15 @@ public class StatisticsService {
 
   private final TodoService todoService;
   private final MongoTemplate mongoTemplate;
-  private final StatisticsMapper statisticsMapper;
+  private final StatisticsMapperService statisticsMapperService;
 
   public StatisticsService(
-      TodoService todoService, MongoTemplate mongoTemplate, StatisticsMapper statisticsMapper) {
+      TodoService todoService,
+      MongoTemplate mongoTemplate,
+      StatisticsMapperService statisticsMapperService) {
     this.todoService = todoService;
     this.mongoTemplate = mongoTemplate;
-    this.statisticsMapper = statisticsMapper;
+    this.statisticsMapperService = statisticsMapperService;
   }
 
   public StatisticsSummaryDto getSummary(LocalDate from, LocalDate to) {
@@ -39,15 +41,15 @@ public class StatisticsService {
   public StatisticsDetailedDto getDetailed(LocalDate from, LocalDate to) {
     StatisticsSummaryDto summary = aggregateSummary(from, to);
     List<Todo> todos = findTodosInRange(from, to);
-    StatisticsTodosDto todosDto = statisticsMapper.toTodosDto(todos);
-    return statisticsMapper.toDetailed(summary, todosDto);
+    StatisticsTodosDto todosDto = statisticsMapperService.toTodosDto(todos);
+    return statisticsMapperService.toDetailed(summary, todosDto);
   }
 
   private StatisticsSummaryDto aggregateSummary(LocalDate from, LocalDate to) {
     Aggregation aggregation = buildAggregation(from, to);
     AggregationResults<Document> results =
         mongoTemplate.aggregate(aggregation, "todos", Document.class);
-    return statisticsMapper.toSummary(results);
+    return statisticsMapperService.toSummary(results);
   }
 
   private Aggregation buildAggregation(LocalDate from, LocalDate to) {
