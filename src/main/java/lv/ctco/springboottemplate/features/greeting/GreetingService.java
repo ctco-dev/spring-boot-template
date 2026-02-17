@@ -17,6 +17,6 @@ public class GreetingService {
 
     String suffix = openTasks == 1 ? "task" : "tasks";
 
-    return "Hello from Spring! You have " + openTasks + " open " + suffix + ".";
+    return String.format("Hello from Spring! You have %d open %s.", openTasks, suffix);
   }
 }
