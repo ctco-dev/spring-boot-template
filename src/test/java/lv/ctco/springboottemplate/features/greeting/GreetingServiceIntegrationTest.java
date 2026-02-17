@@ -3,8 +3,6 @@ package lv.ctco.springboottemplate.features.greeting;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
-import lv.ctco.springboottemplate.features.greeting.GreetingService;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import lv.ctco.springboottemplate.features.todo.TodoRepository;
 import lv.ctco.springboottemplate.features.todo.TodoService;
@@ -30,8 +28,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class GreetingServiceIntegrationTest {
-
-
 
   @Container static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0.8");
 
