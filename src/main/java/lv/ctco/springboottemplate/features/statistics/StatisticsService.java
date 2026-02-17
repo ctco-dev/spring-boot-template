@@ -3,12 +3,9 @@ package lv.ctco.springboottemplate.features.statistics;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsDetailedDto;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsSummaryDto;
-import lv.ctco.springboottemplate.features.statistics.models.StatisticsTodoItemDto;
 import lv.ctco.springboottemplate.features.statistics.models.StatisticsTodosDto;
 import lv.ctco.springboottemplate.features.todo.Todo;
 import lv.ctco.springboottemplate.features.todo.TodoService;
@@ -26,10 +23,13 @@ public class StatisticsService {
 
   private final TodoService todoService;
   private final MongoTemplate mongoTemplate;
+  private final StatisticsMapper statisticsMapper;
 
-  public StatisticsService(TodoService todoService, MongoTemplate mongoTemplate) {
+  public StatisticsService(
+      TodoService todoService, MongoTemplate mongoTemplate, StatisticsMapper statisticsMapper) {
     this.todoService = todoService;
     this.mongoTemplate = mongoTemplate;
+    this.statisticsMapper = statisticsMapper;
   }
 
   public StatisticsSummaryDto getSummary(LocalDate from, LocalDate to) {
@@ -39,21 +39,15 @@ public class StatisticsService {
   public StatisticsDetailedDto getDetailed(LocalDate from, LocalDate to) {
     StatisticsSummaryDto summary = aggregateSummary(from, to);
     List<Todo> todos = findTodosInRange(from, to);
-    StatisticsTodosDto todosDto = buildTodosDto(todos);
-
-    return new StatisticsDetailedDto(
-        summary.totalTodos(),
-        summary.completedTodos(),
-        summary.pendingTodos(),
-        summary.userStats(),
-        todosDto);
+    StatisticsTodosDto todosDto = statisticsMapper.toTodosDto(todos);
+    return statisticsMapper.toDetailed(summary, todosDto);
   }
 
   private StatisticsSummaryDto aggregateSummary(LocalDate from, LocalDate to) {
     Aggregation aggregation = buildAggregation(from, to);
     AggregationResults<Document> results =
         mongoTemplate.aggregate(aggregation, "todos", Document.class);
-    return mapResultsToSummary(results);
+    return statisticsMapper.toSummary(results);
   }
 
   private Aggregation buildAggregation(LocalDate from, LocalDate to) {
@@ -68,35 +62,6 @@ public class StatisticsService {
     }
 
     return Aggregation.newAggregation(groupByUserAndCompletion);
-  }
-
-  private StatisticsSummaryDto mapResultsToSummary(AggregationResults<Document> results) {
-    long total = 0L;
-    long completed = 0L;
-    Map<String, Long> userStats = new HashMap<>();
-
-    for (Document doc : results) {
-      AggregatedRow row = toAggregatedRow(doc);
-
-      total += row.count();
-      if (row.completed()) {
-        completed += row.count();
-      }
-      userStats.merge(row.createdBy(), row.count(), Long::sum);
-    }
-
-    long pending = total - completed;
-    return new StatisticsSummaryDto(total, completed, pending, userStats);
-  }
-
-  private AggregatedRow toAggregatedRow(Document doc) {
-    Document id = (Document) doc.get("_id");
-    String createdBy = id.getString("createdBy");
-    boolean isCompleted = Boolean.TRUE.equals(id.getBoolean("completed"));
-    Number countNumber = doc.get("count", Number.class);
-    long count = countNumber != null ? countNumber.longValue() : 0L;
-
-    return new AggregatedRow(createdBy, isCompleted, count);
   }
 
   private List<Todo> findTodosInRange(LocalDate from, LocalDate to) {
@@ -128,32 +93,4 @@ public class StatisticsService {
   private Instant atEndOfDay(LocalDate date) {
     return date.atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
   }
-
-  private StatisticsTodosDto buildTodosDto(List<Todo> todos) {
-    List<StatisticsTodoItemDto> completedTodos =
-        todos.stream()
-            .filter(Todo::completed)
-            .map(
-                todo ->
-                    new StatisticsTodoItemDto(
-                        todo.id(),
-                        todo.title(),
-                        todo.createdBy(),
-                        todo.createdAt(),
-                        todo.updatedAt()))
-            .toList();
-
-    List<StatisticsTodoItemDto> pendingTodos =
-        todos.stream()
-            .filter(todo -> !todo.completed())
-            .map(
-                todo ->
-                    new StatisticsTodoItemDto(
-                        todo.id(), todo.title(), todo.createdBy(), todo.createdAt(), null))
-            .toList();
-
-    return new StatisticsTodosDto(completedTodos, pendingTodos);
-  }
-
-  private record AggregatedRow(String createdBy, boolean completed, long count) {}
 }
