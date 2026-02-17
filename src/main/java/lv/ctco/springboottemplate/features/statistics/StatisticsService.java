@@ -76,21 +76,27 @@ public class StatisticsService {
     Map<String, Long> userStats = new HashMap<>();
 
     for (Document doc : results) {
-      Document id = (Document) doc.get("_id");
-      String createdBy = id.getString("createdBy");
-      boolean isCompleted = Boolean.TRUE.equals(id.getBoolean("completed"));
-      Number countNumber = doc.get("count", Number.class);
-      long count = countNumber != null ? countNumber.longValue() : 0L;
+      AggregatedRow row = toAggregatedRow(doc);
 
-      total += count;
-      if (isCompleted) {
-        completed += count;
+      total += row.count();
+      if (row.completed()) {
+        completed += row.count();
       }
-      userStats.merge(createdBy, count, Long::sum);
+      userStats.merge(row.createdBy(), row.count(), Long::sum);
     }
 
     long pending = total - completed;
     return new StatisticsSummaryDto(total, completed, pending, userStats);
+  }
+
+  private AggregatedRow toAggregatedRow(Document doc) {
+    Document id = (Document) doc.get("_id");
+    String createdBy = id.getString("createdBy");
+    boolean isCompleted = Boolean.TRUE.equals(id.getBoolean("completed"));
+    Number countNumber = doc.get("count", Number.class);
+    long count = countNumber != null ? countNumber.longValue() : 0L;
+
+    return new AggregatedRow(createdBy, isCompleted, count);
   }
 
   private List<Todo> findTodosInRange(LocalDate from, LocalDate to) {
@@ -148,4 +154,6 @@ public class StatisticsService {
 
     return new StatisticsTodosDto(completedTodos, pendingTodos);
   }
+
+  private record AggregatedRow(String createdBy, boolean completed, long count) {}
 }
